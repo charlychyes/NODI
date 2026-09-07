@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NODI — Strategic Focus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-glass: rgba(18, 21, 28, 0.85);
+            --bg-card: rgba(24, 28, 37, 0.85);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #f97316;
+            --accent-glow: rgba(249, 115, 22, 0.25);
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        [data-theme="light"] {
+            --bg-glass: rgba(255, 255, 255, 0.85);
+            --bg-card: rgba(248, 250, 252, 0.85);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent: #ea580c;
+            --accent-glow: rgba(234, 88, 12, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Arrière-plan global en plein écran */
+        body {
+            background-image: url('https://images.unsplash.com/photo-1542224566-6e85f2e6772f?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            transition: background 0.5s ease;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 7, 11, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: -1;
+        }
+
+        /* Écran de Bienvenue avec image de fond */
+        .welcome-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .welcome-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 12px;
+            color: #fff;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .welcome-subtitle {
+            font-size: 1.05rem;
+            color: #cbd5e1;
+            margin-bottom: 35px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .btn-enter {
+            background: var(--accent);
+            color: #white;
+            border: none;
+            padding: 14px 36px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            box-shadow: 0 10px 30px rgba(249, 115, 22, 0.4);
+        }
+
+        .btn-enter:hover {
+            transform: scale(1.03);
+            opacity: 0.95;
+        }
+
+        /* Conteneur principal */
+        .app-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 28px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-card);
+            position: relative;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 34px;
+            height: 34px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        .brand h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .clock-display {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+            background: var(--bg-glass);
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Menu 3 barres */
+        .menu-btn {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .menu-btn span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background-color: var(--text-main);
+            border-radius: 2px;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 75px;
+            right: 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            display: none;
+            flex-direction: column;
+            width: 190px;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            overflow: hidden;
+        }
+
+        .dropdown-menu.open {
+            display: flex;
+        }
+
+        .dropdown-item {
+            padding: 12px 18px;
+            font-size: 0.9rem;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            text-align: left;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: var(--accent-glow);
+            color: var(--accent);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-content {
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        /* Bouton stylé pour ouvrir le formulaire "Nouveau Bloc" */
+        .btn-add-trigger {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            transition: transform 0.2s;
+        }
+
+        .btn-add-trigger:hover {
+            transform: scale(1.02);
+        }
+
+        /* Widget Actuel */
+        .active-box {
+            position: relative;
+            border-radius: 12px;
+            padding: 20px;
+            overflow: hidden;
+            border: 1px solid var(--accent);
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .active-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.7));
+            z-index: 1;
+        }
+
+        .active-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .active-label {
+            font-size: 0.75rem;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .active-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .active-time {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Carousel / Feuilletage des Plannings en Grand Format */
+        .carousel-container {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            backdrop-filter: blur(12px);
+        }
+
+        .carousel-track {
+            position: relative;
+            height: 260px;
+            width: 100%;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: flex-end;
+            cursor: pointer;
+            transition: background-image 0.4s ease;
+        }
+
+        .carousel-track::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to top, rgba(10, 12, 18, 0.95) 20%, rgba(10, 12, 18, 0.3) 80%);
+            z-index: 1;
+        }
+
+        .carousel-content {
+    position: relative;
+    z-index: 2;
+    padding: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+
+        .slot-big-time {
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 4px;
+            letter-spacing: 0.05em;
+        }
+
+        .slot-big-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .slot-big-hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--border-color);
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .carousel-btn:hover {
+            background: var(--accent);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .carousel-btn.prev { left: 16px; }
+        .carousel-btn.next { right: 16px; }
+
+        .carousel-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border-color);
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .indicator.active {
+            background: var(--accent);
+            transform: scale(1.2);
+        }
+
+        .btn-delete-card {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger);
+            color: #fca5a5;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-delete-card:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Modales (Formulaire d'ajout & Notes) */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            padding: 15px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 520px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            backdrop-filter: blur(16px);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .close-modal {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+        }
+
+        label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        input, textarea {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            padding: 10px 12px;
+            font-size: 0.9rem;
+            outline: none;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--accent);
+        }
+
+        button.btn-primary {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button.btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--success);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--success);
+        }
+    </style>
+    <!-- Intégration de Firebase (App, Auth, Firestore) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  // Ta configuration Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyBYIfQb5iSfiSrNEuyDtwUnXxwFputtAc4",
+    authDomain: "nodi-3d0a5.firebaseapp.com",
+    projectId: "nodi-3d0a5",
+    storageBucket: "nodi-3d0a5.firebasestorage.app",
+    messagingSenderId: "1047923070820",
+    appId: "1:1047923070820:web:2b3fbd28ab34764f0f0c71",
+    measurementId: "G-THCT0F3KT8"
+  };
+
+  // Initialisation
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Connexion anonyme automatique et sécurisée
+  signInAnonymously(auth)
+    .then(() => {
+      console.log("Connecté de manière sécurisée à Firebase !");
+    })
+    .catch((error) => {
+      console.error("Erreur de connexion Firebase :", error);
+    });
+
+  // Rendre les outils accessibles globalement dans ton application
+  window.db = db;
+  window.auth = auth;
+  window.firebaseFns = { collection, doc, setDoc, getDoc, onSnapshot };
+</script>
+
+</head>
+<body>
+
+    <!-- Écran de Bienvenue avec image de fond -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-title">Bienvenue Charly</div>
+        <div class="welcome-subtitle">Initialisation de ton espace stratégique NODI...</div>
+        <button class="btn-enter" onclick="enterApp()">Accéder au tableau de bord</button>
+    </div>
+
+    <!-- Application Container -->
+    <div class="app-container">
+        <header>
+            <div class="brand">
+                <div class="brand-logo">N</div>
+                <h1>NODI</h1>
+            </div>
+            <div class="header-right">
+                <div id="liveClock" class="clock-display">--:--:--</div>
+                <button class="menu-btn" onclick="toggleMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <button class="dropdown-item" onclick="toggleTheme()">Changer de thème</button>
+                <button class="dropdown-item" onclick="resetDefaults()">Réinitialiser</button>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            
+            <!-- Haut : Statut & Déclencheur Nouveau Bloc -->
+            <div class="top-row">
+                <div class="system-status">
+                    <div class="status-dot"></div>
+                    <span>Bloqueur actif</span>
+                </div>
+                <button class="btn-add-trigger" onclick="openAddModal()">+ Nouveau créneau</button>
+            </div>
+
+            <!-- Widget Actuel -->
+            <div class="active-box" id="activeBoxBg">
+                <div class="active-content">
+                    <div class="active-label">Activité en cours</div>
+                    <div id="currentActivityName" class="active-name">Chargement...</div>
+                    <div id="currentActivityTime" class="active-time">--</div>
+                </div>
+            </div>
+
+            <!-- Carousel Grand Format (Feuilletage des Plannings) -->
+            <div>
+                <div class="panel-title" style="margin-bottom: 10px;">Planning Journalier (Feuillete & Clique pour tes notes)</div>
+                <div class="carousel-container">
+                    <button class="carousel-btn prev" onclick="prevSlide()">❮</button>
+                    <button class="carousel-btn next" onclick="nextSlide()">❯</button>
+                                        <!-- Piste du Carousel -->
+                    <div class="carousel-track" id="carouselTrack" onclick="openCurrentSlideModal()">
+                        <div class="carousel-content">
+                            <div>
+                                <div id="carouselSlotTime" class="slot-big-time">08:00 - 10:00</div>
+                                <div id="carouselSlotTitle" class="slot-big-title">Chargement des blocs...</div>
+                                <div class="slot-big-hint">Clique pour voir/modifier les notes & objectifs</div>
+                            </div>
+                            <button class="btn-delete-card" onclick="event.stopPropagation(); deleteCurrentSlot()">Supprimer</button>
+                        </div>
+                    </div>
+
+                    <!-- Indicateurs du Carousel -->
+                    <div class="carousel-indicators" id="carouselIndicators"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modale : Nouveau Créneau -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">Ajouter un créneau stratégique</div>
+                <button class="close-modal" onclick="closeAddModal()">✕</button>
+            </div>
+            <div class="input-group">
+                <label>Titre de l'activité</label>
+                <input type="text" id="newTitle" placeholder="ex: Deep Work / Code / Sport">
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label>Heure de début</label>
+                    <input type="time" id="newStart" value="09:00">
+                </div>
+                <div class="input-group">
+                    <label>Heure de fin</label>
+                    <input type="time" id="newEnd" value="11:00">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Lien d'image de fond (Optionnel Unsplash)</label>
+                <input type="text" id="newImage" placeholder="https://images.unsplash.com/photo-...">
+            </div>
+            <button class="btn-primary" onclick="addNewSlot()">Enregistrer le bloc</button>
+        </div>
+    </div>
+
+    <!-- Modale : Notes, Motivation & Objectifs du Créneau -->
+    <div class="modal-overlay" id="notesModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title" id="notesModalTitle">Détails & Notes du bloc</div>
+                <button class="close-modal" onclick="closeNotesModal()">✕</button>
+            </div>
+            <div class="input-group">
+                <label>Notes & Étapes clés</label>
+                <textarea id="slotNotesInput" rows="5" placeholder="Écris tes notes, objectifs ou consignes pour ce créneau..."></textarea>
+            </div>
+            <button class="btn-primary" onclick="saveSlotNotes()">Mettre à jour les notes</button>
+        </div>
+    </div>
+
+    <!-- Logique JavaScript & Synchronisation Firestore -->
+    <script>
+        // Données par défaut si Firestore est vide
+        let defaultSlots = [
+            {
+                start: "08:00",
+                end: "10:00",
+                title: "Deep Work / Développement",
+                image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1000&q=80",
+                notes: "Avancer sur la structure Firebase et l'authentification."
+            },
+            {
+                start: "10:00",
+                end: "12:00",
+                title: "Stratégie & Rédaction",
+                image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1000&q=80",
+                notes: "Structurer les objectifs de la journée."
+            }
+        ];
+
+        let slots = [...defaultSlots];
+        let currentIndex = 0;
+        let isCloudLoaded = false;
+
+        // --- GESTION FIRESTORE (Sauvegarde & Chargement temps réel) ---
+        async function saveUserData() {
+            const user = window.auth?.currentUser;
+            if (!user) return;
+
+            const { doc, setDoc } = window.firebaseFns;
+            try {
+                const userDocRef = doc(window.db, "users", user.uid);
+                await setDoc(userDocRef, {
+                    schedules: slots,
+                    lastUpdated: new Date()
+                }, { merge: true });
+            } catch (error) {
+                console.error("Erreur de sauvegarde cloud :", error);
+            }
+        }
+
+        function initCloudSync() {
+            const authInterval = setInterval(() => {
+                const user = window.auth?.currentUser;
+                if (user) {
+                    clearInterval(authInterval);
+                    const { doc, onSnapshot } = window.firebaseFns;
+                    const userDocRef = doc(window.db, "users", user.uid);
+
+                    onSnapshot(userDocRef, (docSnap) => {
+                        if (docSnap.exists() && docSnap.data().schedules) {
+                            slots = docSnap.data().schedules;
+                        } else {
+                            // Première initialisation cloud avec les valeurs par défaut
+                            saveUserData();
+                        }
+                        isCloudLoaded = true;
+                        updateCarousel();
+                        updateActiveBox();
+                    });
+                }
+            }, 500);
+        }
+
+        // Lancement de l'écoute cloud au chargement
+        window.addEventListener("DOMContentLoaded", () => {
+            initCloudSync();
+            setInterval(updateClock, 1000);
+            setInterval(updateActiveBox, 10000);
+        });
+
+        // --- INTERFACE & NAVIGATION ---
+        function enterApp() {
+            document.getElementById('welcomeScreen').classList.add('hidden');
+        }
+
+        function toggleMenu() {
+            document.getElementById('dropdownMenu').classList.toggle('open');
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            html.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
+            toggleMenu();
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('liveClock').innerText = now.toTimeString().split(' ')[0];
+        }
+
+                        function updateCarousel() {
+            if (slots.length === 0) {
+                document.getElementById('slideTitle').innerText = "Aucun créneau planifié";
+                document.getElementById('slideTime').innerText = "--:-- - --:--";
+                document.getElementById('carouselTrack').style.backgroundImage = "none";
+                document.getElementById('carouselIndicators').innerHTML = "";
+                return;
+            }
+
+            if (currentIndex >= slots.length) currentIndex = 0;
+            const current = slots[currentIndex];
+
+            document.getElementById('slideTitle').innerText = current.title;
+            document.getElementById('slideTime').innerText = `${current.start} - ${current.end}`;
+            document.getElementById('carouselTrack').style.backgroundImage = `url('${current.image || defaultSlots[0].image}')`;
+
+            const indicatorsContainer = document.getElementById('carouselIndicators');
+            indicatorsContainer.innerHTML = "";
+            slots.forEach((_, idx) => {
+                const dot = document.createElement('div');
+                dot.className = `indicator ${idx === currentIndex ? 'active' : ''}`;
+                dot.onclick = () => { currentIndex = idx; updateCarousel(); };
+                indicatorsContainer.appendChild(dot);
+            });
+        }
+                function nextSlide() {
+            if (slots.length === 0) return;
+            currentIndex = (currentIndex + 1) % slots.length;
+            updateCarousel();
+        }
+
+        function prevSlide() {
+            if (slots.length === 0) return;
+            currentIndex = (currentIndex - 1 + slots.length) % slots.length;
+            updateCarousel();
+        }
+
+        function updateActiveBox() {
+            if (slots.length === 0) return;
+            const now = new Date();
+            const currentTimeStr = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
+
+            let activeSlot = slots.find(s => currentTimeStr >= s.start && currentTimeStr <= s.end) || slots[0];
+
+            document.getElementById('currentActivityName').innerText = activeSlot.title;
+            document.getElementById('currentActivityTime').innerText = `${activeSlot.start} - ${activeSlot.end}`;
+            document.getElementById('activeBoxBg').style.backgroundImage = `url('${activeSlot.image}')`;
+        }
+
+        // --- MODALES & GESTION DES DONNÉES ---
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('open');
+            toggleMenu();
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('open');
+        }
+
+        function addNewSlot() {
+            const title = document.getElementById('newTitle').value.trim();
+            const start = document.getElementById('newStart').value;
+            const end = document.getElementById('newEnd').value;
+            const image = document.getElementById('newImage').value.trim();
+
+            if (!title) {
+                alert("Veuillez renseigner un titre pour le créneau.");
+                return;
+            }
+
+            slots.push({
+                start,
+                end,
+                title,
+                image: image || "https://images.unsplash.com/photo-1542224566-6e85f2e6772f?auto=format&fit=crop&w=1000&q=80",
+                notes: ""
+            });
+
+            saveUserData();
+            updateCarousel();
+            updateActiveBox();
+            closeAddModal();
+
+            document.getElementById('newTitle').value = "";
+            document.getElementById('newImage').value = "";
+        }
+
+        function deleteCurrentSlot() {
+            if (slots.length <= 1) {
+                alert("Vous devez garder au moins un créneau.");
+                return;
+            }
+            slots.splice(currentIndex, 1);
+            currentIndex = 0;
+            saveUserData();
+            updateCarousel();
+            updateActiveBox();
+        }
+
+        function openCurrentSlideModal() {
+            if (slots.length === 0) return;
+            const current = slots[currentIndex];
+            document.getElementById('notesModalTitle').innerText = `Notes : ${current.title}`;
+            document.getElementById('slotNotesInput').value = current.notes || "";
+            document.getElementById('notesModal').classList.add('open');
+        }
+
+        function closeNotesModal() {
+            document.getElementById('notesModal').classList.remove('open');
+        }
+
+        function saveSlotNotes() {
+            if (slots.length === 0) return;
+            const notes = document.getElementById('slotNotesInput').value;
+            slots[currentIndex].notes = notes;
+            saveUserData();
+            closeNotesModal();
+        }
+
+        function resetDefaults() {
+            slots = [...defaultSlots];
+            currentIndex = 0;
+            saveUserData();
+            updateCarousel();
+            updateActiveBox();
+            toggleMenu();
+        }
+    </script>
+</body>
+</html>
